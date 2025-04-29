@@ -1,0 +1,68 @@
+import React, { useEffect } from 'react';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider } from 'styled-components';
+import styled from 'styled-components';
+import { theme } from './styles/theme';
+import Onboarding from './pages/Onboarding';
+import Payment from './pages/Payment';
+import Leaderboard from './pages/Leaderboard';
+import GlobalStyle from './styles/GlobalStyle';
+
+const AppContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: ${({ theme }) => theme.colors.background};
+`;
+
+const App: React.FC = () => {
+  useEffect(() => {
+    // Check if we're running inside Telegram WebApp
+    if (window.Telegram?.WebApp) {
+      const tg = window.Telegram.WebApp;
+      
+      // Initialize WebApp
+      tg.ready();
+      tg.expand();
+
+      // В версии 8.0+ мы сначала проверяем, находится ли приложение в полноэкранном режиме
+      if (!tg.isFullscreen) {
+        try {
+          // Включаем полноэкранный режим только если он еще не включен
+          tg.setViewport({ height: "100vh" });
+        } catch (error) {
+          console.error('Error setting viewport:', error);
+        }
+      }
+
+      // Log initialization for debugging
+      console.log('Telegram WebApp initialized:', {
+        initData: tg.initData,
+        user: tg.initDataUnsafe.user,
+        isFullscreen: tg.isFullscreen
+      });
+    } else {
+      console.log('Running outside of Telegram WebApp');
+    }
+  }, []);
+
+  console.log('App rendering');
+
+  return (
+    <ThemeProvider theme={theme}>
+      <GlobalStyle />
+      <AppContainer>
+        <HashRouter>
+          <Routes>
+            <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/payment" element={<Payment />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/" element={<Navigate to="/onboarding" replace />} />
+          </Routes>
+        </HashRouter>
+      </AppContainer>
+    </ThemeProvider>
+  );
+};
+
+export default App; 
