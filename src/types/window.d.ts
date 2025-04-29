@@ -5,7 +5,10 @@ export interface TelegramWebApps {
     close(): void;
     isExpanded: boolean;
     isFullscreen: boolean;
-    setViewport(params: { height: string }): void;
+    requestFullscreen(): void;
+    exitFullscreen(): void;
+    onEvent(eventType: 'fullscreenChanged' | 'viewportChanged', eventHandler: () => void): void;
+    offEvent(eventType: 'fullscreenChanged' | 'viewportChanged', eventHandler: () => void): void;
     MainButton: {
       text: string;
       color: string;

@@ -25,15 +25,15 @@ const App: React.FC = () => {
       tg.ready();
       tg.expand();
 
-      // В версии 8.0+ мы сначала проверяем, находится ли приложение в полноэкранном режиме
-      if (!tg.isFullscreen) {
-        try {
-          // Включаем полноэкранный режим только если он еще не включен
-          tg.setViewport({ height: "100vh" });
-        } catch (error) {
-          console.error('Error setting viewport:', error);
-        }
-      }
+      // Запрашиваем полноэкранный режим
+      tg.requestFullscreen();
+
+      // Подписываемся на изменения полноэкранного режима
+      const handleFullscreenChange = () => {
+        console.log('Fullscreen mode changed:', tg.isFullscreen);
+      };
+
+      tg.onEvent('fullscreenChanged', handleFullscreenChange);
 
       // Log initialization for debugging
       console.log('Telegram WebApp initialized:', {
@@ -41,6 +41,11 @@ const App: React.FC = () => {
         user: tg.initDataUnsafe.user,
         isFullscreen: tg.isFullscreen
       });
+
+      // Отписываемся от событий при размонтировании
+      return () => {
+        tg.offEvent('fullscreenChanged', handleFullscreenChange);
+      };
     } else {
       console.log('Running outside of Telegram WebApp');
     }
